@@ -1,75 +1,108 @@
-# Data Lineage Use-Cases Documentation
-This repository contains the code required to set up the environments described in Lineage Use-Case based documentation. Use this code to follow along each use-case.
+# Data lineage use cases
+
+This repository contains the code you use to set up the environment required for completing the [data lineage use cases](https://docs.cloud.google.com/dataplex/docs/lineage-use-cases-overview).
 
 ## Prerequisites
-*   A Google Cloud Project with Billing enabled.
-*   Google Cloud CLI (`gcloud`, `bq`) installed and configured (or use Cloud Shell).
-*   Sufficient IAM permissions in your project (e.g., BigQuery Admin, Data Lineage Viewer).
-*   The following APIs must be enabled in your project:
+
+*   A Google Cloud Project with **Billing** enabled.
+*   Google Cloud CLI (`gcloud`, `bq`) [installed and configured](https://docs.cloud.google.com/sdk/docs/install-sdk). Alternatively, you can use Cloud Shell.
+*   Sufficient IAM permissions in your project:
+     * Data Lineage Viewer
+     * BigQuery Data Viewer
+     * BigQuery Resource Viewer
+     * Dataplex Catalog Viewer 
+     * Dataform Editor
+       
+    For more information about the required roles, see [required roles](https://clouddocs.devsite.corp.google.com/dataplex/docs/lineage-use-cases-prerequisites?db=bczyz-dataplex#required_roles)
+
+*   The following APIs enabled in your project:
     *   BigQuery API
     *   BigQuery Data Transfer API
     *   Data Lineage API
+    
+    You can enable APIs using the Cloud Console or by running the command: `gcloud services enable <service.googleapis.com>`.
 
-You can enable APIs via the console or `gcloud services enable <service.googleapis.com>`.
+## Steps
 
+To set the pre-built state in your Google Cloud Console for running the lineage use cases you must do the following:
 
-Moreover, in order to set the pre-built state in your google cloud console for the various lineage use-cases, you need to follow the steps in this section related to: 
-* Create a  GitHub Personal Access Token (PAT) and add it to Secret Manager
-* Create a Dataform repository connected 
+* Create a  GitHub Personal Access Token (PAT) and add it to Secret Manager.
+* Connect the Github repository to Dataform. 
 
 ### 1. Create a  GitHub Personal Access Token (PAT) and add it to Secret Manager
 
-#### Step 1: Create a GitHub Token (PAT)
-In order to connect  Google Cloud, you need a "key" from GitHub. Follow this steps to create one: 
+#### Create a GitHub Token (PAT)
 
-* In GitHub, go to Settings -> Developer Settings -> Personal Access Tokens -> Tokens (classic).
-* Click Generate new token (classic).
-* Select Name: "Dataform-Client-Access".
-* Expiration: Select "No expiration" (or a long duration).
-* Scopes: Check the box for repo (this allows Dataform to see your code).
-* Copy the Token: Save it somewhere safe. You will never see it again!
+To connect your GitHub repository to Google Cloud, you need a **key/token** from GitHub. Follow this steps to create a key: 
 
-#### Step 2: Save the Token in Secret Manager
-Now, you need to store that key securely in Google Cloud.
+1. In GitHub, click your profile icon and go to **Settings** > **Developer Settings** > **Personal access tokens** > **Tokens (classic)**.
+1. Select **Generate new token (classic)** from the menu.
+1. In the **Note field**, enter the name `Dataform-Client-Access`.
+1. For **Expiration**, select `No expiration` (or a long duration).
+1. For **Scopes**, check the box for **repo** to allow Dataform to see your code.
+1. Click **Generate token**.
+1. Copy the token and save it somewhere safe. Once you leave the page, you won't be able to access the token.
 
-* In the Google Cloud Console, search for Secret Manager.
-* Click Create Secret.
-* Give a name Name, such as: github-token.
-* Secret Value: Paste the token you just copied from GitHub.
-* Click Create.
+#### Save the token in Secret Manager
 
-#### Step 3: Give Dataform Permission to Read the Secret
+Now you need to store the generated key securely in Google Cloud.
+
+1. In the Google Cloud Console, search for **Secret Manager**.
+1. In the **Secrets** tab, click **Create Secret**.
+1. In the **Name** field, provide the name. For example `github-token`.
+1. In the **Secret value** field, paste the token you copied from GitHub.
+1. Click **Create secret**.
+
+#### Give Dataform permission to read the secret
+
 By default, Dataform isn't allowed to see your secrets. You have to give it "Permission to peek."
 
-* In Google Cloud's Secret Manager click on the github-token secret you just created.
-* Go to the Permissions tab.
-* Click Grant Access and add the Dataform Service Acount. Note: This usually looks like: service-[PROJECT_NUMBER]@gcp-sa-dataform.iam.gserviceaccount.com. As role select 'Select Secret Manager Secret Accessor.'
-* Click Save.
+1. In the **Secret Manager**, click the `github-token` secret you just created.
+1. Go to the **Permissions** tab.
+1. Click **Grant access** to add the Dataform Service Account.
+1. In the **Add principals** field, add the service account. It usually looks as follows: `service-[PROJECT_NUMBER]@gcp-sa-dataform.iam.gserviceaccount.com`.
+1. In the **Assign roles** section, select the **Secret Manager Secret Accessor** role.
+1. Click **Save**.
 
 
 ### 2. Connect Dataform to the Github repository
 
-In order to have the pre-built state necessary for each use-case, you need to follow the steps of this section:
+To have the pre-built state necessary for each use case, perform the following steps:
 
-* Fork this github repository 
-* In Google Cloud's dataform page, select 'Create Repository', fill the 'Repository ID' and 'Region' Fields, and click on 'Create'
-* In Dataform, go to your Repository Settings.
-* Click Connect with Git and fill the fields: 
-  * Fill the Remote Git URL with the yout forked repository URL.
-  * Choose Default Branch: main (or master).
-  * Secret: Select the github-token secret you just created from the dropdown.
-  * Click Link.
+1. Fork this GitHub repository.
+1. In the Google Cloud Console, go to **Dataform** page.
+1. Select **Create Repository**
+   1. Fill in  **Repository ID** and **Region** fields, and click **Create**.
+1. Co back to the main page. Click your repository name.
+1. Click **Settings**.
+1. Click **Connect with Git** and fill the fields: 
+  1. In the **Remote Git repository URL** field, enter your forked repository URL.
+  1. In the **Default branch name** field, enter the branch name (most probably main (or master)).
+  1. In the **Secret** field, select the `github-token` secret you have already created in the previous step.
+  1. Click **Link**.
+ 
+#### Create a workspace
 
-After these steps you will be able to see github's code in your dataform repository.
+A development workspace allows you to browse and execute code in Dataform
 
-## How to run each use case
+1. In the **Dataform** page, click the name of the linked repository.
+1. Go to **Development Workspaces** tab.
+1. Click **Create development workspace**.
+1. Provide the workspace ID.
+1. Click **Create**.
 
-To run the defined code for each use case:
-1. Ensure that you have changed 'defaultProject' to your GCP PROJECT NAME in 'workflow_settings.yaml'
-2. With the repository code open in datafrom, click Start Execution -> Actions -> Multiple Actions.
-3. Choose to run a selection of tags.
-   * For use case 'Impact Analysis' you will choose the tag 'impact-analysis'
-   * For use case 'Optimize Costs' you will choose the tag 'optimize-costs'
-   * For use case 'PII Leakage' you will choose the tag 'pii-leakage'
-4. Click Start Execution.
+Performing these steps allows you to see the code from GitHub repository in your Dataform repository.
+
+## How to run a specific use case
+
+To run the defined code for a specific use case:
+
+1. Ensure that you have changed `defaultProject` to your <GCP_PROJECT_NAME> in `workflow_settings.yaml`.
+1. In **Dataform** page, click your repository name. From there, click the workspace name.
+1. In the top menu, select **Start execution** > **Actions** > **Multiple actions**.
+1. Click **Selection of tags** and select a tag depending on the use case:
+   * For use case **Impact Analysis**, choose the tag `impact-analysis`
+   * For use case **Optimize Costs**, choose the tag `optimize-costs`
+   * For use case **PII Leakage**, choose the tag `pii-leakage`
+1. Click **Start Execution**.
 
